@@ -49,7 +49,7 @@ int main(int argc,char *argv[]){
     printf("pid=%d\n",getpid());
 
     char *output_file="output.json";
-    char *input_file="input.csv";
+    char *input_file="input2.csv";
     
     //int res=writeTojson(output_file);
     FILE *input;

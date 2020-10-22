@@ -51,14 +51,15 @@ void spliteByMultiThread(threadContainer *json,int array_num,int thread_num){
     void *ret=0;
     for(int i=0;i<thread_num;++i){
         //printf("%d %d\n",json[0].start_index,numStringInThread);
-        pthread_create(&myThread[i],NULL,child,(void*)&start_idx[i]);       
+        pthread_create(&myThread[i],NULL,child,(void*)&start_idx[i]);
+            
         //printf("next thread!!!\n");
         
     }
     for(int i=0;i<thread_num;++i){
 
-        pthread_join(myThread[i],&ret);
-
+        
+        pthread_join(myThread[i],&ret);  
         //printf("thread %d finish\n",i);
     }
     //printf("\n");
@@ -67,13 +68,14 @@ void spliteByMultiThread(threadContainer *json,int array_num,int thread_num){
 }
 int main(int argc,char *argv[]){
     printf("pid=%d\n",getpid());
-
+    double spliteTime=0;
+    clock_t start_t,end_t,total_t;
     char *output_file="output.json";
     char *input_file="input2.csv";
     //int res=writeTojson(output_file);
     FILE *input;
     FILE *output;
-    int array_num=50000;
+    int array_num=20000;
     int count=0;
     int thread_num=atoi(argv[1]);//number of thread 
     
@@ -83,7 +85,7 @@ int main(int argc,char *argv[]){
 
     input=fopen(input_file,"r");//per thread handle string num
     output=fopen(output_file,"w");
-    
+
     
     fwrite("[\n",1,sizeof(char)*2,output);
     while (!feof(input))
@@ -96,7 +98,19 @@ int main(int argc,char *argv[]){
             //printf("successful\n");
             spliteByMultiThread(json,array_num,thread_num);
             for(int i=0;i<array_num;++i){
-                 //fputs(json[i].buffer,output);
+                // for(int k=0;k<20;++k){
+                
+                //     char *tmp=malloc(sizeof(char)*20);
+                //     if(k<19){
+                //         sprintf(tmp,"%d|",json[i].array[k]);
+                //         fputs(tmp,output);
+                //     }
+                //     else{
+                //         sprintf(tmp,"%d\n",json[i].array[k]);
+                //         fputs(tmp,output);
+                //     }
+                //     free(tmp);
+                // }
                 fwrite("    {\n",1,sizeof(char)*6,output);
                 for(int j=0;j<20;++j){
                     
@@ -112,12 +126,7 @@ int main(int argc,char *argv[]){
                     free(tmp);
                 }
                 fwrite("    },\n",1,sizeof(char)*7,output);
-                //printf("\n");
             }
-
-
-            //here to write to json file
-            //writeTojson(output_file,json,array_num);
 
 
 
