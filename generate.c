@@ -4,13 +4,13 @@
 #include<unistd.h>
 int main(){
     printf("pid=%d\n",getpid());
-    char *output="input2.csv";
+    char *output="input3.csv";
     FILE *out;
     out=fopen(output,"w");
     int change_line=0;
     int num=0;
     char *str=malloc(sizeof(char)*10);
-    for(int i=0;i<100000;++i){
+    for(int i=0;i<200000;++i){
         while (change_line<20)
         {
             num=rand()%30;
