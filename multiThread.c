@@ -3,7 +3,6 @@
 #include<pthread.h>
 #include<unistd.h>
 #include<string.h>
-#include<json-c/json.h>
 int column_count=0;
 int numStringInThread=0;
 struct threadContainer
@@ -66,30 +65,6 @@ void spliteByMultiThread(threadContainer *json,int array_num,int thread_num){
     free(myThread);
     
 }
-int writeTojson(char *output_name){
-    int ret=0;
-    json_object *json_obj=NULL;
-    json_object *main_obj=NULL;
-    json_object *temp_obj=NULL;
-    json_object *array_obj=NULL;
-    json_object *new_obj=NULL;
-
-    //new a base object
-    json_obj=json_object_new_object();
-    if(!json_obj){
-        printf("Cannot create object\n");
-        ret=-1;
-    }
-    temp_obj = json_object_new_string("hey");
-    json_object_object_add(json_obj,"1",temp_obj);
-    temp_obj=NULL;
-    temp_obj = json_object_new_string("suck");
-    json_object_object_add(json_obj,"2",temp_obj);
-    json_object_to_file(output_name,json_obj);
-
-    printf("return\n");
-	return ret;
-}
 int main(int argc,char *argv[]){
     printf("pid=%d\n",getpid());
 
@@ -98,7 +73,7 @@ int main(int argc,char *argv[]){
     //int res=writeTojson(output_file);
     FILE *input;
     FILE *output;
-    int array_num=20000;
+    int array_num=50000;
     int count=0;
     int thread_num=atoi(argv[1]);//number of thread 
     
@@ -108,6 +83,9 @@ int main(int argc,char *argv[]){
 
     input=fopen(input_file,"r");//per thread handle string num
     output=fopen(output_file,"w");
+    
+    
+    fwrite("[\n",1,sizeof(char)*2,output);
     while (!feof(input))
     {
         
@@ -119,19 +97,21 @@ int main(int argc,char *argv[]){
             spliteByMultiThread(json,array_num,thread_num);
             for(int i=0;i<array_num;++i){
                  //fputs(json[i].buffer,output);
+                fwrite("    {\n",1,sizeof(char)*6,output);
                 for(int j=0;j<20;++j){
-                   
-                    char *tmp=malloc(sizeof(char)*20);
+                    
+                    char *tmp=malloc(sizeof(char)*50);
                     if(j<19){
-                        sprintf(tmp,"%d|",json[i].array[j]);
-                        fputs(tmp,output);
+                        sprintf(tmp,"       ""col_%d"":%d,\n",j+1,json[i].array[j]);
+                        fwrite(tmp,1,strlen(tmp),output);
                     }
                     else{
-                        sprintf(tmp,"%d\n",json[i].array[j]);
-                        fputs(tmp,output);
+                        sprintf(tmp,"       ""col_%d"":%d\n",j+1,json[i].array[j]);
+                        fwrite(tmp,1,strlen(tmp),output);
                     }
                     free(tmp);
                 }
+                fwrite("    },\n",1,sizeof(char)*7,output);
                 //printf("\n");
             }
 
@@ -147,10 +127,6 @@ int main(int argc,char *argv[]){
         }
         
     }
-    if(!feof(input))
-        printf("not end!");
-    else
-        printf("end %d",feof(input));
-
+    fwrite("]",1,sizeof(char),output);
     
 }
